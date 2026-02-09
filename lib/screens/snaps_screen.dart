@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+
 import 'art_gallery_screen.dart'; // Re-using the FullScreenImageViewer from here
 
-class GalleryScreen extends StatelessWidget {
-  const GalleryScreen({super.key});
+class SnapsScreen extends StatelessWidget {
+  const SnapsScreen({super.key});
 
   final List<String> snaps = const [
     "https://drive.google.com/uc?export=view&id=1_hqV4rDf366xQZPg3FLbcFkn0NGBqYZY",
@@ -43,7 +44,13 @@ class GalleryScreen extends StatelessWidget {
         child: CustomScrollView(
           slivers: [
             const SliverAppBar(
-              title: Text('Snaps', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+              title: Text(
+                'Snaps',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
               backgroundColor: Colors.transparent,
               iconTheme: IconThemeData(color: Colors.white),
               elevation: 0,
@@ -78,7 +85,9 @@ class GalleryScreen extends StatelessWidget {
                         fit: BoxFit.cover,
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
-                          return const Center(child: CircularProgressIndicator());
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
                         },
                       ),
                     ),

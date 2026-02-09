@@ -1,6 +1,8 @@
+import 'package:bahuandfarisart/screens/artist_detail_screen.dart';
 import 'package:flutter/material.dart';
+
 import 'art_gallery_screen.dart';
-import 'gallery_screen.dart';
+import 'snaps_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -9,433 +11,214 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        height: 1000,
         decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment.topCenter,
-            radius: 2.0,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
             colors: [
-              Color(0xFF6A11CB),
-              Color(0xFF2575FC),
-              Color(0xFF050816),
+              Color(0xFF3A3852), // Warm, dusky purple
+              Color(0xFF2E2D3E), // Deep, soft charcoal
             ],
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
             child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        'Welcome Back',
-                        style: TextStyle(
-                          color: Colors.white60,
-                          fontSize: 13,
-                        ),
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        'Artistic Journey',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-
-
-                    ],
-                  ),
-                ],
-              ),
-              Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // ───────── TOP BAR ─────────
-                const SizedBox(height: 24),
+                const Spacer(),
+                // --- HEADER ---
+                const Text(
+                  'Bahu & Faris',
+                  style: TextStyle(
+                    fontFamily: 'Serif', // A more artistic font if available
+                    color: Colors.white,
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Text(
+                  'An Artistic Journey',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 16,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                const Spacer(flex: 2),
 
-                // ───────── HERO CARD ─────────
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF020617),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: Colors.white24,
+                // --- ARTIST AVATARS ---
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _ArtistAvatar(
+                      name: 'Muhammad Hassnat Bahu',
+                      avatarAsset:
+                          'assets/artist/PHOTO-2026-02-08-20-25-56.jpg',
+                      onTap: () => _navigateToArtistDetail(context, bahuData),
+                    ),
+                    _ArtistAvatar(
+                      name: 'Muhammad Faris',
+                      avatarAsset:
+                          'assets/artist/PHOTO-2026-02-08-20-30-06.jpg',
+                      onTap: () => _navigateToArtistDetail(context, farisData),
+                    ),
+                  ],
+                ),
+                const Spacer(flex: 3),
+
+                // --- NAVIGATION BUTTONS ---
+                _NavigationButton(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ArtGalleryScreen(),
                     ),
                   ),
-
-                  child: Column(// ─────── ROW + COLUMN MIX LAYOUT ───────
-                  children:[
-                    Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-
-                      // ───── LEFT SIDE : AVATAR ─────
-                      Container(
-                        width: 90,
-                        height: 90,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: const Color(0xFF818CF8),
-                            width: 2,
-                          ),
-                        ),
-                        child: ClipOval(
-                          child: Image.asset(
-                            'assets/artist/PHOTO-2026-02-08-20-25-56.jpg',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(width: 16),
-
-                      // ───── RIGHT SIDE : ALL TEXT ─────
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-
-                            const Text(
-                              'Hasnat Bahu',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-
-                            const SizedBox(height: 4),
-
-                            const Text(
-                              'Drawing • Painting • Creative exploration',
-                              style: TextStyle(
-                                color: Colors.white60,
-                                fontSize: 13,
-                              ),
-                            ),
-
-                            const SizedBox(height: 10),
-                          ],
-                        ),
-                      ),
-                    ],
+                  icon: Icons.brush_outlined,
+                  label: 'View Artworks',
+                ),
+                const SizedBox(height: 16),
+                _NavigationButton(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SnapsScreen(),
+                    ),
                   ),
-                  Column(
-                    children: [
-                     Column(// ───── YOUR EXPANDABLE INTRO (UNCHANGED) ─────
-                     children: [ExpandableIntroText(
-                        text:
-                        'I create expressive artwork inspired by nature, emotion and '
-                            'imagination. This space keeps all my drawings together '
-                            'in one simple gallery. I believe art is a journey of self discovery '
-                            'and every stroke carries a story, a feeling, and a silent message '
-                            'that connects hearts beyond words.',
-                      ),])
-                    ],
-                  ),
-               ] ),
-          ),
-
-                // const SizedBox(height: 24),
-
+                  icon: Icons.photo_camera_back_outlined,
+                  label: 'View Snaps',
+                ),
+                const Spacer(),
               ],
-            ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // ──
-
-                  // ───────── HERO CARD ─────────
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // ───────── TOP BAR ─────────
-                      const SizedBox(height: 24),
-
-                      // ───────── HERO CARD ─────────
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF020617),
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(
-                            color: Colors.white24,
-                          ),
-                        ),
-
-                        child: Column(// ─────── ROW + COLUMN MIX LAYOUT ───────
-                            children:[
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-
-                                  // ───── LEFT SIDE : AVATAR ─────
-                                  Container(
-                                    width: 90,
-                                    height: 90,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: const Color(0xFF818CF8),
-                                        width: 2,
-                                      ),
-                                    ),
-                                    child: ClipOval(
-                                      child: Image.asset(
-                                        'assets/artist/PHOTO-2026-02-08-20-30-06.jpg',
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-
-                                  const SizedBox(width: 16),
-
-                                  // ───── RIGHT SIDE : ALL TEXT ─────
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          'Faris Khalique',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-
-                                         SizedBox(height: 4),
-
-                                        const Text(
-                                          'Drawing • Painting • Creative exploration',
-                                          style: TextStyle(
-                                            color: Colors.white60,
-                                            fontSize: 13,
-                                          ),
-                                        ),
-
-                                        const SizedBox(height: 10),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                children: [
-                                  Column(// ───── YOUR EXPANDABLE INTRO (UNCHANGED) ─────
-                                      children: [ExpandableIntroText(
-                                        text:
-                                        'I create expressive artwork inspired by nature, emotion and '
-                                            'imagination. This space keeps all my drawings together '
-                                            'in one simple gallery. I believe art is a journey of self discovery '
-                                            'and every stroke carries a story, a feeling, and a silent message '
-                                            'that connects hearts beyond words.',
-                                      ),])
-                                ],
-                              ),
-                            ] ),
-                      ),
-
-                      // const SizedBox(height: 24),
-
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const ArtGalleryScreen()),
-                      );
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFF6A11CB),
-                            Color(0xFF2575FC),
-                          ],
-                        ),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'View Artworks',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const GalleryScreen()),
-                      );
-                    },
-                 child:  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white30),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'Artist Photo',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ),
-
-          )
-                ],
-              ),
-             ]
             ),
           ),
         ),
       ),
     );
   }
-}
 
-class ExpandableIntroText extends StatefulWidget {
-  final String text;
-
-  const ExpandableIntroText({super.key, required this.text});
-
-  @override
-  State<ExpandableIntroText> createState() => _ExpandableIntroTextState();
-}
-
-class _ExpandableIntroTextState extends State<ExpandableIntroText> {
-  bool isExpanded = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Stack(
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              height: isExpanded ? null : 80,
-              child: Text(
-                widget.text,
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 14,
-                  height: 1.5,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-
-            // BLUR EFFECT WHEN NOT EXPANDED
-            if (!isExpanded)
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  height: 40,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        const Color(0xFF020617).withOpacity(0.9),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-          ],
+  void _navigateToArtistDetail(
+    BuildContext context,
+    Map<String, String> artistData,
+  ) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ArtistDetailScreen(
+          name: artistData['name']!,
+          skills: artistData['skills']!,
+          avatarAsset: artistData['avatarAsset']!,
+          intro: artistData['intro']!,
         ),
-
-        const SizedBox(height: 6),
-
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              isExpanded = !isExpanded;
-            });
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 14),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white24),
-            ),
-            child: Text(
-              isExpanded ? "Show less" : "View more",
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-              ),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
 
+// --- ARTIST DATA MAPS ---
+const bahuData = {
+  'name': 'Muhammad Hassnat Bahu',
+  'skills': 'Drawing • Painting • Animal & Nature Art',
+  'avatarAsset': 'assets/artist/PHOTO-2026-02-08-20-25-56.jpg',
+  'intro':
+      'Welcome to the Creative World of Muhammad Hassnat Bahoo...\n\nMeet Muhammad Hassnat Bahoo — a young artist with an extraordinary eye for detail and a heart full of imagination. Hassnat loves drawing, painting, and bringing the beauty of animals and the rainforest to life through his artwork. His passion for creativity shines in every piece he creates, and he takes great pride in his growing portfolio.\n\nThis website is a window into his artistic world — a place where colors, creatures, and creativity come together to celebrate his talent and ever‑expanding artistic journey.',
+};
 
+const farisData = {
+  'name': 'Muhammad Faris',
+  'skills': 'Astronomy & Space • Geography & Maps • Drawing & Art',
+  'avatarAsset': 'assets/artist/PHOTO-2026-02-08-20-30-06.jpg',
+  'intro':
+      'Welcome to Muhammad Faris’s World of Wonder...\n\nStep into the vibrant universe of Muhammad Faris — a curious young explorer with a passion for discovering how our world and the cosmos work. Faris loves learning about astronomy, planets, and the solar system, and he’s just as fascinated by the amazing animals that share our planet. His curiosity doesn’t stop there: he enjoys exploring body parts and how they function, studying countries and maps, and diving into the mysteries of rocks, volcanoes, and geology.\n\nWith a sketchbook always nearby, Faris brings his discoveries to life through drawing and art. This website is his creative playground — a place where science, geography, nature, and imagination come together in colorful harmony.',
+};
 
+// --- WIDGETS ---
 
+class _ArtistAvatar extends StatelessWidget {
+  final String name;
+  final String avatarAsset;
+  final VoidCallback onTap;
 
-
-class _StatItem extends StatelessWidget {
-  final String value;
-  final String label;
-
-  const _StatItem({required this.value, required this.label});
+  const _ArtistAvatar({
+    required this.name,
+    required this.avatarAsset,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: const Color(0xFF818CF8), width: 3),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.4),
+                  blurRadius: 15,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: ClipOval(child: Image.asset(avatarAsset, fit: BoxFit.cover)),
           ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white60,
-            fontSize: 11,
+          const SizedBox(height: 16),
+          Text(
+            name,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NavigationButton extends StatelessWidget {
+  final VoidCallback onTap;
+  final IconData icon;
+  final String label;
+
+  const _NavigationButton({
+    required this.onTap,
+    required this.icon,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white.withOpacity(0.2)),
+          color: Colors.white.withOpacity(0.1),
         ),
-      ],
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: Colors.white70),
+            const SizedBox(width: 12),
+            Text(
+              label,
+              style: const TextStyle(color: Colors.white70, fontSize: 16),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

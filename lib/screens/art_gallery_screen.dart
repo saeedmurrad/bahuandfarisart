@@ -1,18 +1,256 @@
-import 'dart:typed_data';
+import 'dart:ui'; // Needed for the blur effect
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:http/http.dart' as http;
 import 'package:share_plus/share_plus.dart';
 
-// --- MAIN GALLERY SCREEN ---
-// This screen shows the tabs and the grid of thumbnails.
+// --- MODERN FULL-SCREEN IMAGE VIEWER ---
+
+class FullScreenImageViewer extends StatefulWidget {
+  final List<String> imageUrls;
+  final int initialIndex;
+  final bool isAsset;
+
+  const FullScreenImageViewer({
+    super.key,
+    required this.imageUrls,
+    required this.initialIndex,
+    this.isAsset = false,
+  });
+
+  @override
+  State<FullScreenImageViewer> createState() => _FullScreenImageViewerState();
+}
+
+class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
+  late PageController _pageController;
+  late int _currentIndex;
+  bool _isSharing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+    _pageController = PageController(initialPage: _currentIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _onShare() async {
+    setState(() {
+      _isSharing = true;
+    });
+
+    try {
+      final String imageUrl = widget.imageUrls[_currentIndex];
+      XFile file;
+
+      if (widget.isAsset) {
+        final ByteData bytes = await rootBundle.load(imageUrl);
+        file = XFile.fromData(
+          bytes.buffer.asUint8List(),
+          name: imageUrl.split('/').last,
+          mimeType: 'image/jpeg',
+        );
+      } else {
+        final http.Response response = await http.get(Uri.parse(imageUrl));
+        file = XFile.fromData(
+          response.bodyBytes,
+          name: 'image.jpg',
+          mimeType: 'image/jpeg',
+        );
+      }
+
+      await Share.shareXFiles([file], text: 'Bahu & Faris Art Gallary');
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Error sharing image.')));
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSharing = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final currentImageUrl = widget.imageUrls[_currentIndex];
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          // --- Immersive Blurred Background ---
+          Positioned.fill(
+            child: widget.isAsset
+                ? Image.asset(currentImageUrl, fit: BoxFit.cover)
+                : Image.network(currentImageUrl, fit: BoxFit.cover),
+          ),
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              child: Container(color: Colors.black.withOpacity(0.4)),
+            ),
+          ),
+
+          // --- Main Image Viewer with Pinch-to-Zoom ---
+          PageView.builder(
+            controller: _pageController,
+            itemCount: widget.imageUrls.length,
+            itemBuilder: (context, index) {
+              final imageUrl = widget.imageUrls[index];
+              return InteractiveViewer(
+                minScale: 1.0,
+                maxScale: 4.0,
+                child: Center(
+                  child: widget.isAsset
+                      ? Image.asset(imageUrl)
+                      : Image.network(
+                          imageUrl,
+                          loadingBuilder: (context, child, progress) {
+                            if (progress == null) return child;
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            );
+                          },
+                        ),
+                ),
+              );
+            },
+            onPageChanged: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+          ),
+
+          // --- "Floating" UI Elements (AppBar and Navigation) ---
+          _buildFloatingUI(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFloatingUI(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // --- Custom Floating AppBar ---
+        Container(
+          padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+          color: Colors.black.withOpacity(0.3),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              Text(
+                '${_currentIndex + 1} / ${widget.imageUrls.length}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              if (_isSharing)
+                const Padding(
+                  padding: EdgeInsets.only(right: 16.0),
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  ),
+                )
+              else
+                IconButton(
+                  icon: const Icon(Icons.share_outlined, color: Colors.white),
+                  onPressed: _onShare,
+                ),
+            ],
+          ),
+        ),
+
+        // --- Navigation Controls ---
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (_currentIndex > 0)
+                _NavigationButton(
+                  icon: Icons.arrow_back_ios_new,
+                  onPressed: () => _pageController.previousPage(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  ),
+                )
+              else
+                const SizedBox(width: 50), // Placeholder for alignment
+
+              if (_currentIndex < widget.imageUrls.length - 1)
+                _NavigationButton(
+                  icon: Icons.arrow_forward_ios,
+                  onPressed: () => _pageController.nextPage(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  ),
+                )
+              else
+                const SizedBox(width: 50), // Placeholder for alignment
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _NavigationButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  const _NavigationButton({required this.icon, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.4),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, color: Colors.white, size: 24),
+      ),
+    );
+  }
+}
+
+// --- MODERN ART GALLERY SCREEN (UNCHANGED) ---
 
 class ArtGalleryScreen extends StatelessWidget {
   const ArtGalleryScreen({super.key});
 
-  // --- IMAGE DATA ---
-  // These lists are static. To add or remove images, you must edit the lists
-  // and republish the app.
-  final List<String> artGalleryImages = const [
+  final List<String> artworks = const [
     "https://drive.google.com/uc?export=view&id=1g8Nggi0AvjghxUlHWD2Uhcm7uiWipmuC",
     "https://drive.google.com/uc?export=view&id=1FVlgSFWn6faGCK2zvPpXudBzGPliALgN",
     "https://drive.google.com/uc?export=view&id=1t_k89uX4PXtdfO3zVt5GKsl8XwGR_v0d",
@@ -59,241 +297,72 @@ class ArtGalleryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Art Gallery'),
-
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment.topCenter,
+            radius: 1.5,
+            colors: [Color(0xFF6A11CB), Color(0xFF2575FC), Color(0xFF050816)],
+          ),
         ),
-        body: TabBarView(
-          children: [
-            buildGridView(context, artGalleryImages, 'Art Gallery'),
-
+        child: CustomScrollView(
+          slivers: [
+            const SliverAppBar(
+              title: Text(
+                'Artworks',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              backgroundColor: Colors.transparent,
+              iconTheme: IconThemeData(color: Colors.white),
+              elevation: 0,
+              floating: true,
+              pinned: true,
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.all(12.0),
+              sliver: SliverMasonryGrid.count(
+                crossAxisCount: 2,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                itemBuilder: (context, index) {
+                  final artworkUrl = artworks[index];
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FullScreenImageViewer(
+                            imageUrls: artworks,
+                            initialIndex: index,
+                            isAsset: false,
+                          ),
+                        ),
+                      );
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12.0),
+                      child: Image.network(
+                        artworkUrl,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                },
+                childCount: artworks.length,
+              ),
+            ),
           ],
         ),
-      ),
-    );
-  }
-
-  // Helper method to build the grid of image thumbnails
-  Widget buildGridView(
-      BuildContext context,
-      List<String> images,
-      String galleryName,
-      ) {
-    if (images.isEmpty) {
-      return Center(
-        child: Text('No images found in the "$galleryName" folder.'),
-      );
-    }
-    return GridView.builder(
-      itemCount: images.length,
-      padding: const EdgeInsets.all(4.0),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 4.0,
-        mainAxisSpacing: 4.0,
-      ),
-      itemBuilder: (context, index) {
-        // Use GestureDetector to make each thumbnail tappable
-        return GestureDetector(
-          onTap: () {
-            // When tapped, open the full-screen viewer
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => FullScreenImageViewer(
-                  imageUrls: images,
-                  initialIndex: index,
-                  galleryName: galleryName,
-                ),
-              ),
-            );
-          },
-          child: Image.network(
-            images[index],
-            fit: BoxFit.cover,
-            // Show a loading indicator for each thumbnail
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return const Center(child: CircularProgressIndicator());
-            },
-          ),
-        );
-      },
-    );
-  }
-}
-
-// --- FULL-SCREEN IMAGE VIEWER ---
-// This screen shows one image at a time, allows swiping, has next/previous
-// buttons, and a share button.
-
-class FullScreenImageViewer extends StatefulWidget {
-  final List<String> imageUrls;
-  final int initialIndex;
-  final String galleryName;
-
-  const FullScreenImageViewer({
-    super.key,
-    required this.imageUrls,
-    required this.initialIndex,
-    required this.galleryName,
-  });
-
-  @override
-  State<FullScreenImageViewer> createState() => _FullScreenImageViewerState();
-}
-
-class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
-  late PageController _pageController;
-  late int _currentIndex;
-  bool _isSharing = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentIndex = widget.initialIndex;
-    _pageController = PageController(initialPage: _currentIndex);
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _onShare() async {
-    setState(() {
-      _isSharing = true;
-    });
-
-    try {
-      // Download the image data from the URL
-      final imageUrl = widget.imageUrls[_currentIndex];
-      final response = await http.get(Uri.parse(imageUrl));
-      final Uint8List bytes = response.bodyBytes;
-
-      // Create an XFile from the downloaded bytes to share the image file
-      final XFile file = XFile.fromData(
-        bytes,
-        name: 'image.jpg',
-        mimeType: 'image/jpeg',
-      );
-
-      // Use the share_plus package to show the native share sheet
-      await Share.shareXFiles([file], text: 'Bahu & Faris Art Gallary');
-    } catch (e) {
-      // Handle potential errors, e.g., show a snackbar
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Error sharing image.')));
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isSharing = false;
-        });
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: Text(
-          '${_currentIndex + 1} / ${widget.imageUrls.length}',
-          style: const TextStyle(color: Colors.white),
-        ),
-        actions: [
-          // Show a loading indicator while the image is being prepared for sharing
-          if (_isSharing)
-            const Padding(
-              padding: EdgeInsets.only(right: 16.0),
-              child: Center(
-                child: SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            )
-          else
-            IconButton(icon: const Icon(Icons.share), onPressed: _onShare),
-        ],
-      ),
-      body: Stack(
-        alignment: Alignment.center,
-        children: [
-          // The PageView handles the main image display and swiping
-          PageView.builder(
-            controller: _pageController,
-            itemCount: widget.imageUrls.length,
-            itemBuilder: (context, index) {
-              return Center(
-                child: Image.network(
-                  widget.imageUrls[index],
-                  // Show a loading indicator while the full-res image loads
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                            : null,
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
-            onPageChanged: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
-            },
-          ),
-
-          // --- NAVIGATION BUTTONS ---
-          // Previous Button
-          if (_currentIndex > 0)
-            Align(
-              alignment: Alignment.centerLeft,
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                onPressed: () {
-                  _pageController.previousPage(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  );
-                },
-              ),
-            ),
-          // Next Button
-          if (_currentIndex < widget.imageUrls.length - 1)
-            Align(
-              alignment: Alignment.centerRight,
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
-                onPressed: () {
-                  _pageController.nextPage(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  );
-                },
-              ),
-            ),
-        ],
       ),
     );
   }
