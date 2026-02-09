@@ -213,7 +213,7 @@ class DashboardScreen extends StatelessWidget {
                                           ),
                                         ),
 
-                                        const SizedBox(height: 4),
+                                         SizedBox(height: 4),
 
                                         const Text(
                                           'Drawing • Painting • Creative exploration',
