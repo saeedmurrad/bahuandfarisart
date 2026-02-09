@@ -12,50 +12,7 @@ class GalleryScreen extends StatelessWidget {
   // --- IMAGE DATA ---
   // These lists are static. To add or remove images, you must edit the lists
   // and republish the app.
-  final List<String> artGalleryImages = const [
-    "https://drive.google.com/uc?export=view&id=1g8Nggi0AvjghxUlHWD2Uhcm7uiWipmuC",
-    "https://drive.google.com/uc?export=view&id=1FVlgSFWn6faGCK2zvPpXudBzGPliALgN",
-    "https://drive.google.com/uc?export=view&id=1t_k89uX4PXtdfO3zVt5GKsl8XwGR_v0d",
-    "https://drive.google.com/uc?export=view&id=1wnyTZTv5FU_QIi-Z-Q8KR0kX4-TXqh0v",
-    "https://drive.google.com/uc?export=view&id=1v_iOHYbyR4mGbKWcsmIFOeQ2hyy8hjcP",
-    "https://drive.google.com/uc?export=view&id=1zIAM86AZA-J1T2BwSSYfZZuf__5UARrB",
-    "https://drive.google.com/uc?export=view&id=1MafhM_-Y5GjB3PWLtwrnq_5G_KWFwme4",
-    "https://drive.google.com/uc?export=view&id=1VY61bM6cvqhRkJ4_6dHiNIgHMoeuCMh7",
-    "https://drive.google.com/uc?export=view&id=1RYwnDmgJnIfGY0erlMbru-Bfza2s12U_",
-    "https://drive.google.com/uc?export=view&id=10iLwA75SG_FMzdZ10gUdHi3g0n6Esksk",
-    "https://drive.google.com/uc?export=view&id=1fWf95ehleunVh3jdnZbTn2WUOq5vNzuq",
-    "https://drive.google.com/uc?export=view&id=1vQQ6aros5bRNzkxW09So_znTF9qgSjx3",
-    "https://drive.google.com/uc?export=view&id=1TN00de-vyNRi1cv32UTSluUmeRuBSg0O",
-    "https://drive.google.com/uc?export=view&id=10Dvqrfv92ywiOFEKPtsTEjB52cwCT_9U",
-    "https://drive.google.com/uc?export=view&id=1WB62KQ05IKetCDUB_iqt8o5B8_nv_Lbv",
-    "https://drive.google.com/uc?export=view&id=15ik1WRyIAeJR2tr4hkcS0d_7RIon_EuO",
-    "https://drive.google.com/uc?export=view&id=1Fo_7n9lNzDnkCtvLfXw7KXehzmdxzDi-",
-    "https://drive.google.com/uc?export=view&id=1oKL_Jgds6hbam-78wKWi2ecmjfojgR-v",
-    "https://drive.google.com/uc?export=view&id=1s1oY7kDk6mJEhe0LqPp30Z0I8V9uPKiU",
-    "https://drive.google.com/uc?export=view&id=1266b8cJ0xVdeM82nfbap3w1spJpcpcGR",
-    "https://drive.google.com/uc?export=view&id=1MaXAWspiKM27-LH9Yxt7p5-ZNitlFX_A",
-    "https://drive.google.com/uc?export=view&id=18fxu2uw87olAAGtGL44J-UZtXEOo7qRN",
-    "https://drive.google.com/uc?export=view&id=1OhrfU3ff6ZxFoUV_Gios9OFtzXM1ZbSF",
-    "https://drive.google.com/uc?export=view&id=1P-9NiuA9w122KriecdOg953T9TeItSGE",
-    "https://drive.google.com/uc?export=view&id=1lmFgspKN1f1pwZv_aPVDMRG1s_Oe0sMY",
-    "https://drive.google.com/uc?export=view&id=1T-xn_tnm6EnerXzd8rcqIysDu_PFCS81",
-    "https://drive.google.com/uc?export=view&id=1QPoD5STHQcODDOgjQ8caJiY6oAORkZ-Q",
-    "https://drive.google.com/uc?export=view&id=1Kui4OW6hBe681NmbIU99Lvxaio3NkBHx",
-    "https://drive.google.com/uc?export=view&id=13LVNapqtGrzsuQjPdNV19EorL8OaUIcH",
-    "https://drive.google.com/uc?export=view&id=1UX6Odb73oXNhldvuGZJ17cShUmJWn9ad",
-    "https://drive.google.com/uc?export=view&id=1EVzPmTQ-TrbVqMVF_XdPbb7DVlanNTfo",
-    "https://drive.google.com/uc?export=view&id=1kxbGTuaVq_RVEy88tNYtlSXtoXRYjv59",
-    "https://drive.google.com/uc?export=view&id=14Wimor3Plz7VCVRyjx8KHJDicWFikmK5",
-    "https://drive.google.com/uc?export=view&id=11NnjmntszH-XAYz6-PLDGsqdGCilf8Lc",
-    "https://drive.google.com/uc?export=view&id=1mxo7T-03rpNJ_9X3dHAGc3oZhhtvwTdP",
-    "https://drive.google.com/uc?export=view&id=1rG_nyXn4wITIL8a6jU5B8jNJpO2WMmhG",
-    "https://drive.google.com/uc?export=view&id=1D720Bh-av4Hi1behZGiehU_wmmpp5Gu9",
-    "https://drive.google.com/uc?export=view&id=1Av7tERlIGCc2ChpaKeVmX5-7gbkXLu2M",
-    "https://drive.google.com/uc?export=view&id=1_5WHNGhVelDyakScSnojZePglusBKffj",
-    "https://drive.google.com/uc?export=view&id=1h9eshSyx2Xv32G1sA1DLxpRUYexqjJCJ",
-    "https://drive.google.com/uc?export=view&id=16L4C_mZ1tCDrdCOWUi4oc75EbApC6nt0",
-    "https://drive.google.com/uc?export=view&id=1K_JMy6GmUbZzpnSVRdvPH1DOYBelPYey",
-  ];
+
 
   final List<String> picsGalleryImages = const [
     "https://drive.google.com/uc?export=view&id=1_hqV4rDf366xQZPg3FLbcFkn0NGBqYZY",
@@ -87,17 +44,11 @@ class GalleryScreen extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Gallery'),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Art Gallery'),
-              Tab(text: 'Pics Gallery'),
-            ],
-          ),
+          title: const Text('Pics Gallery'),
         ),
         body: TabBarView(
           children: [
-            buildGridView(context, artGalleryImages, 'Art Gallery'),
+
             buildGridView(context, picsGalleryImages, 'Pics Gallery'),
           ],
         ),
