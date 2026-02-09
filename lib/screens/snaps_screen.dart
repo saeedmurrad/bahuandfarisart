@@ -3,10 +3,15 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import 'art_gallery_screen.dart'; // Re-using the FullScreenImageViewer from here
 
-class SnapsScreen extends StatelessWidget {
+class SnapsScreen extends StatefulWidget {
   const SnapsScreen({super.key});
 
-  final List<String> snaps = const [
+  @override
+  State<SnapsScreen> createState() => _SnapsScreenState();
+}
+
+class _SnapsScreenState extends State<SnapsScreen> {
+  final List<String> _originalSnaps = const [
     "https://drive.google.com/uc?export=view&id=1_hqV4rDf366xQZPg3FLbcFkn0NGBqYZY",
     "https://drive.google.com/uc?export=view&id=1uS6nhkIDYdOYJ_IffHGApjYnq_ssBM3Y",
     "https://drive.google.com/uc?export=view&id=1f-uNBElPGhPrbTao7z_1n41cYUclHEDg",
@@ -29,16 +34,26 @@ class SnapsScreen extends StatelessWidget {
     "https://drive.google.com/uc?export=view&id=1-ZTgVytZ17XsNukiMCCZYI8qxT4Hfyxh",
     "https://drive.google.com/uc?export=view&id=1xHhQuqwyKIdA1nPaDhoFXD-7YNDpj74T",
   ];
+  late List<String> _shuffledSnaps;
+
+  @override
+  void initState() {
+    super.initState();
+    _shuffledSnaps = List.of(_originalSnaps)..shuffle();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment.topCenter,
-            radius: 1.5,
-            colors: [Color(0xFF6A11CB), Color(0xFF2575FC), Color(0xFF050816)],
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFFBF8F3), // Soft off-white
+              Color(0xFFF3E9E4), // Muted dusty rose
+            ],
           ),
         ),
         child: CustomScrollView(
@@ -48,11 +63,11 @@ class SnapsScreen extends StatelessWidget {
                 'Snaps',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Color(0xFF422B22),
                 ),
               ),
               backgroundColor: Colors.transparent,
-              iconTheme: IconThemeData(color: Colors.white),
+              iconTheme: IconThemeData(color: Color(0xFF422B22)),
               elevation: 0,
               floating: true,
               pinned: true,
@@ -64,14 +79,14 @@ class SnapsScreen extends StatelessWidget {
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
                 itemBuilder: (context, index) {
-                  final snapUrl = snaps[index];
+                  final snapUrl = _shuffledSnaps[index];
                   return GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => FullScreenImageViewer(
-                            imageUrls: snaps,
+                            imageUrls: _shuffledSnaps,
                             initialIndex: index,
                             isAsset: false,
                           ),
@@ -85,15 +100,20 @@ class SnapsScreen extends StatelessWidget {
                         fit: BoxFit.cover,
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
-                          return const Center(
-                            child: CircularProgressIndicator(),
+                          return Container(
+                            color: const Color(0xFFD3C5BC),
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                color: Color(0xFF6E5B52),
+                              ),
+                            ),
                           );
                         },
                       ),
                     ),
                   );
                 },
-                childCount: snaps.length,
+                childCount: _shuffledSnaps.length,
               ),
             ),
           ],

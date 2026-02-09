@@ -28,29 +28,57 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
   late PageController _pageController;
   late int _currentIndex;
   bool _isSharing = false;
+  bool _isOrientationUnlocked = false;
+  late TransformationController _transformationController;
 
   @override
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
     _pageController = PageController(initialPage: _currentIndex);
+    _transformationController = TransformationController();
+    // Start locked in portrait
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
   }
 
   @override
   void dispose() {
+    // Reset orientation preference when leaving the screen
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     _pageController.dispose();
+    _transformationController.dispose();
     super.dispose();
+  }
+
+  void _toggleOrientationLock() {
+    setState(() {
+      _isOrientationUnlocked = !_isOrientationUnlocked;
+      if (_isOrientationUnlocked) {
+        // Allow the OS to rotate to any of the 4 orientations
+        SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+      } else {
+        // Lock back to portrait
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]);
+      }
+    });
   }
 
   Future<void> _onShare() async {
     setState(() {
       _isSharing = true;
     });
-
     try {
       final String imageUrl = widget.imageUrls[_currentIndex];
       XFile file;
-
       if (widget.isAsset) {
         final ByteData bytes = await rootBundle.load(imageUrl);
         file = XFile.fromData(
@@ -66,7 +94,6 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
           mimeType: 'image/jpeg',
         );
       }
-
       await Share.shareXFiles([file], text: 'Bahu & Faris Art Gallary');
     } catch (e) {
       if (mounted) {
@@ -86,12 +113,10 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
   @override
   Widget build(BuildContext context) {
     final currentImageUrl = widget.imageUrls[_currentIndex];
-
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // --- Immersive Blurred Background ---
           Positioned.fill(
             child: widget.isAsset
                 ? Image.asset(currentImageUrl, fit: BoxFit.cover)
@@ -103,16 +128,22 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
               child: Container(color: Colors.black.withOpacity(0.4)),
             ),
           ),
-
-          // --- Main Image Viewer with Pinch-to-Zoom ---
           PageView.builder(
             controller: _pageController,
             itemCount: widget.imageUrls.length,
             itemBuilder: (context, index) {
               final imageUrl = widget.imageUrls[index];
+              final key = GlobalKey();
               return InteractiveViewer(
+                key: key,
+                transformationController: _transformationController,
                 minScale: 1.0,
                 maxScale: 4.0,
+                panEnabled: true,
+                boundaryMargin: EdgeInsets.zero,
+                onInteractionEnd: (details) {
+                  _transformationController.value = Matrix4.identity();
+                },
                 child: Center(
                   child: widget.isAsset
                       ? Image.asset(imageUrl)
@@ -133,11 +164,10 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
             onPageChanged: (index) {
               setState(() {
                 _currentIndex = index;
+                _transformationController.value = Matrix4.identity();
               });
             },
           ),
-
-          // --- "Floating" UI Elements (AppBar and Navigation) ---
           _buildFloatingUI(context),
         ],
       ),
@@ -148,12 +178,10 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // --- Custom Floating AppBar ---
         Container(
           padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
           color: Colors.black.withOpacity(0.3),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -166,6 +194,16 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
+              ),
+              const Spacer(),
+              IconButton(
+                icon: Icon(
+                  _isOrientationUnlocked
+                      ? Icons.screen_lock_rotation
+                      : Icons.screen_rotation,
+                  color: Colors.white,
+                ),
+                onPressed: _toggleOrientationLock,
               ),
               if (_isSharing)
                 const Padding(
@@ -187,8 +225,6 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
             ],
           ),
         ),
-
-        // --- Navigation Controls ---
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
           child: Row(
@@ -203,8 +239,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
                   ),
                 )
               else
-                const SizedBox(width: 50), // Placeholder for alignment
-
+                const SizedBox(width: 50),
               if (_currentIndex < widget.imageUrls.length - 1)
                 _NavigationButton(
                   icon: Icons.arrow_forward_ios,
@@ -214,7 +249,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
                   ),
                 )
               else
-                const SizedBox(width: 50), // Placeholder for alignment
+                const SizedBox(width: 50),
             ],
           ),
         ),
@@ -245,12 +280,16 @@ class _NavigationButton extends StatelessWidget {
   }
 }
 
-// --- MODERN ART GALLERY SCREEN (UNCHANGED) ---
-
-class ArtGalleryScreen extends StatelessWidget {
+// --- MODERN ART GALLERY SCREEN ---
+class ArtGalleryScreen extends StatefulWidget {
   const ArtGalleryScreen({super.key});
 
-  final List<String> artworks = const [
+  @override
+  State<ArtGalleryScreen> createState() => _ArtGalleryScreenState();
+}
+
+class _ArtGalleryScreenState extends State<ArtGalleryScreen> {
+  final List<String> _originalArtworks = const [
     "https://drive.google.com/uc?export=view&id=1g8Nggi0AvjghxUlHWD2Uhcm7uiWipmuC",
     "https://drive.google.com/uc?export=view&id=1FVlgSFWn6faGCK2zvPpXudBzGPliALgN",
     "https://drive.google.com/uc?export=view&id=1t_k89uX4PXtdfO3zVt5GKsl8XwGR_v0d",
@@ -294,16 +333,26 @@ class ArtGalleryScreen extends StatelessWidget {
     "https://drive.google.com/uc?export=view&id=16L4C_mZ1tCDrdCOWUi4oc75EbApC6nt0",
     "https://drive.google.com/uc?export=view&id=1K_JMy6GmUbZzpnSVRdvPH1DOYBelPYey",
   ];
+  late List<String> _shuffledArtworks;
+
+  @override
+  void initState() {
+    super.initState();
+    _shuffledArtworks = List.of(_originalArtworks)..shuffle();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment.topCenter,
-            radius: 1.5,
-            colors: [Color(0xFF6A11CB), Color(0xFF2575FC), Color(0xFF050816)],
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFFBF8F3), // Soft off-white
+              Color(0xFFF3E9E4), // Muted dusty rose
+            ],
           ),
         ),
         child: CustomScrollView(
@@ -313,11 +362,11 @@ class ArtGalleryScreen extends StatelessWidget {
                 'Artworks',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Color(0xFF422B22),
                 ),
               ),
               backgroundColor: Colors.transparent,
-              iconTheme: IconThemeData(color: Colors.white),
+              iconTheme: IconThemeData(color: Color(0xFF422B22)),
               elevation: 0,
               floating: true,
               pinned: true,
@@ -329,14 +378,14 @@ class ArtGalleryScreen extends StatelessWidget {
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
                 itemBuilder: (context, index) {
-                  final artworkUrl = artworks[index];
+                  final artworkUrl = _shuffledArtworks[index];
                   return GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => FullScreenImageViewer(
-                            imageUrls: artworks,
+                            imageUrls: _shuffledArtworks,
                             initialIndex: index,
                             isAsset: false,
                           ),
@@ -350,15 +399,20 @@ class ArtGalleryScreen extends StatelessWidget {
                         fit: BoxFit.cover,
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
-                          return const Center(
-                            child: CircularProgressIndicator(),
+                          return Container(
+                            color: const Color(0xFFD3C5BC),
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                color: Color(0xFF6E5B52),
+                              ),
+                            ),
                           );
                         },
                       ),
                     ),
                   );
                 },
-                childCount: artworks.length,
+                childCount: _shuffledArtworks.length,
               ),
             ),
           ],

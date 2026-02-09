@@ -16,99 +16,112 @@ class ArtistDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      extendBodyBehindAppBar: true, // Allows the body to go behind the app bar
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF2E3141), // Deep slate blue
-              Color(0xFF1B1C25), // Dark charcoal
-            ],
+      // We don't need an app bar, as we will create a custom floating back button.
+      body: Stack(
+        children: [
+          // --- Full-Width Header Image ---
+          Container(
+            height: screenHeight * 0.4,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(avatarAsset),
+                fit: BoxFit.cover,
+                alignment: Alignment.topCenter,
+              ),
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
+          // --- Gradient for Text Readability ---
+          Container(
+            height: screenHeight * 0.4,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.transparent, Colors.black.withOpacity(0.6)],
+              ),
+            ),
+          ),
+
+          // --- Scrollable Content Sheet ---
+          SingleChildScrollView(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 20),
-                // --- Large Avatar ---
+                SizedBox(
+                  height: screenHeight * 0.35,
+                ), // Start content below the header
                 Container(
-                  width: 150,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: const Color(0xFF818CF8),
-                      width: 3,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFBF8F3), // Canvas background color
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(30),
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.5),
-                        blurRadius: 20,
-                        spreadRadius: 5,
-                      ),
-                    ],
                   ),
-                  child: ClipOval(
-                    child: Image.asset(avatarAsset, fit: BoxFit.cover),
-                  ),
-                ),
-                const SizedBox(height: 24),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // --- Name and Skills ---
+                        Text(
+                          name,
+                          style: const TextStyle(
+                            fontFamily: 'Serif',
+                            color: Color(0xFF422B22),
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          skills,
+                          style: const TextStyle(
+                            color: Color(0xFFC89B79),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Divider(
+                          color: const Color(0xFF422B22).withOpacity(0.2),
+                        ),
+                        const SizedBox(height: 24),
 
-                // --- Name and Skills ---
-                Text(
-                  name,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  skills,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Color(0xFFc7d2fe),
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(height: 32),
-
-                // --- Divider ---
-                Divider(
-                  color: Colors.white.withOpacity(0.2),
-                  indent: 40,
-                  endIndent: 40,
-                ),
-                const SizedBox(height: 32),
-
-                // --- Introduction Text ---
-                Text(
-                  intro,
-                  textAlign: TextAlign.justify,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.85),
-                    fontSize: 15,
-                    height: 1.7,
+                        // --- Introduction Text ---
+                        Text(
+                          intro,
+                          style: const TextStyle(
+                            color: Color(0xFF6E5B52),
+                            fontSize: 15,
+                            height: 1.8,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-        ),
+
+          // --- Floating Back Button ---
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 10,
+            left: 10,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.3),
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
