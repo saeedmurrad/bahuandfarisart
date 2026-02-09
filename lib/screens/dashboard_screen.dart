@@ -54,7 +54,7 @@ class DashboardScreen extends StatelessWidget {
                   children: [
                     _ArtistAvatar(
                       name: 'Muhammad Hassnat Bahu',
-                      avatarAsset: 'assets/artist/bahu.jpg',
+                      avatarAsset: 'assets/artist/bahu-2.jpg',
                       onTap: () => _navigateToArtistDetail(context, bahuData),
                     ),
                     _ArtistAvatar(
@@ -64,7 +64,19 @@ class DashboardScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                const Spacer(flex: 3),
+                const Spacer(flex: 2),
+
+                // --- ARTISTIC SLOGAN ---
+                const Text(
+                  '"Creativity in Every Stroke"',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontStyle: FontStyle.italic,
+                    color: Color(0xFF6E5B52),
+                    fontSize: 16,
+                  ),
+                ),
+                const Spacer(flex: 1),
 
                 // --- NAVIGATION BUTTONS ---
                 _NavigationButton(
@@ -90,6 +102,15 @@ class DashboardScreen extends StatelessWidget {
                   label: 'View Snaps',
                 ),
                 const Spacer(),
+
+                // --- CREATOR CREDIT ---
+                const Text(
+                  'Made by Saeed Murrad',
+                  style: TextStyle(
+                    color: Color(0xFFB0A49D), // Subtle, light brown
+                    fontSize: 12,
+                  ),
+                ),
               ],
             ),
           ),
@@ -251,7 +272,7 @@ const bahuData = {
 const farisData = {
   'name': 'Muhammad Faris',
   'skills': 'Astronomy & Space • Geography & Maps • Drawing & Art',
-  'avatarAsset': 'assets/artist/faris.jpg',
+  'avatarAsset': 'assets/artist/faris-2.jpg',
   'intro':
       'Welcome to Muhammad Faris’s World of Wonder...\n\nStep into the vibrant universe of Muhammad Faris — a curious young explorer with a passion for discovering how our world and the cosmos work. Faris loves learning about astronomy, planets, and the solar system, and he’s just as fascinated by the amazing animals that share our planet. His curiosity doesn’t stop there: he enjoys exploring body parts and how they function, studying countries and maps, and diving into the mysteries of rocks, volcanoes, and geology.\n\nWith a sketchbook always nearby, Faris brings his discoveries to life through drawing and art. This website is his creative playground — a place where science, geography, nature, and imagination come together in colorful harmony.',
 };
