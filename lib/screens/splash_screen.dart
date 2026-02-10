@@ -132,14 +132,14 @@ class _SplashScreenState extends State<SplashScreen>
                       position: _bahuAnimation, // Left-sliding animation
                       child: ScaleTransition(
                         scale: _scaleAnimation,
-                        child: _buildAvatar('assets/artist/faris-splash.jpg'),
+                        child: _buildAvatar('assets/artist/bahu-splash.jpg'),
                       ),
                     ),
                     SlideTransition(
                       position: _farisAnimation, // Right-sliding animation
                       child: ScaleTransition(
                         scale: _scaleAnimation,
-                        child: _buildAvatar('assets/artist/bahu-splash.jpg'),
+                        child: _buildAvatar('assets/artist/faris-splash.jpg'),
                       ),
                     ),
                   ],

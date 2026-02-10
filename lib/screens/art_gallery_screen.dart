@@ -30,6 +30,8 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
   bool _isSharing = false;
   bool _isOrientationUnlocked = false;
   late TransformationController _transformationController;
+  int rotationIndex = 0;
+
 
   @override
   void initState() {
@@ -43,6 +45,11 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
       DeviceOrientation.portraitDown,
     ]);
   }
+  void rotateImageClockwise() {
+    setState(() {
+      rotationIndex = (rotationIndex + 1) % 4;
+    });
+  }
 
   @override
   void dispose() {
@@ -55,7 +62,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
     _transformationController.dispose();
     super.dispose();
   }
-
+/*
   void _toggleOrientationLock() {
     setState(() {
       _isOrientationUnlocked = !_isOrientationUnlocked;
@@ -72,6 +79,8 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
     });
   }
 
+
+ */
   Future<void> _onShare() async {
     setState(() {
       _isSharing = true;
@@ -145,20 +154,21 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
                   _transformationController.value = Matrix4.identity();
                 },
                 child: Center(
-                  child: widget.isAsset
-                      ? Image.asset(imageUrl)
-                      : Image.network(
-                          imageUrl,
-                          loadingBuilder: (context, child, progress) {
-                            if (progress == null) return child;
-                            return const Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                              ),
-                            );
-                          },
-                        ),
+                  child: AnimatedRotation(
+                    turns: rotationIndex / 4, // 👈 USE rotationIndex HERE
+                    duration: const Duration(milliseconds: 300),
+                    child: widget.isAsset
+                        ? Image.asset(imageUrl)
+                        : Image.network(
+                      imageUrl,
+                      loadingBuilder: (context, child, progress) {
+                        if (progress == null) return child;
+                        return const CircularProgressIndicator(color: Colors.white);
+                      },
+                    ),
+                  ),
                 ),
+
               );
             },
             onPageChanged: (index) {
@@ -196,6 +206,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
                 ),
               ),
               const Spacer(),
+              /*
               IconButton(
                 icon: Icon(
                   _isOrientationUnlocked
@@ -205,6 +216,14 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
                 ),
                 onPressed: _toggleOrientationLock,
               ),
+
+
+               */
+              IconButton(
+                icon: const Icon(Icons.screen_rotation, color: Colors.white),
+                onPressed: rotateImageClockwise,
+              ),
+
               if (_isSharing)
                 const Padding(
                   padding: EdgeInsets.only(right: 16.0),

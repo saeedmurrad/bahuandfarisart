@@ -264,7 +264,7 @@ class _NavigationButton extends StatelessWidget {
 const bahuData = {
   'name': 'Muhammad Hassnat Bahu',
   'skills': 'Drawing • Painting • Animal & Nature Art',
-  'avatarAsset': 'assets/artist/bahu-2.jpg',
+  'avatarAsset': 'assets/artist/bahu.jpg',
   'intro':
       'Welcome to the Creative World of Muhammad Hassnat Bahoo...\n\nMeet Muhammad Hassnat Bahoo — a young artist with an extraordinary eye for detail and a heart full of imagination. Hassnat loves drawing, painting, and bringing the beauty of animals and the rainforest to life through his artwork. His passion for creativity shines in every piece he creates, and he takes great pride in his growing portfolio.\n\nThis website is a window into his artistic world — a place where colors, creatures, and creativity come together to celebrate his talent and ever‑expanding artistic journey.',
 };
@@ -272,7 +272,7 @@ const bahuData = {
 const farisData = {
   'name': 'Muhammad Faris',
   'skills': 'Astronomy & Space • Geography & Maps • Drawing & Art',
-  'avatarAsset': 'assets/artist/faris-2.jpg',
+  'avatarAsset': 'assets/artist/faris.jpg',
   'intro':
       'Welcome to Muhammad Faris’s World of Wonder...\n\nStep into the vibrant universe of Muhammad Faris — a curious young explorer with a passion for discovering how our world and the cosmos work. Faris loves learning about astronomy, planets, and the solar system, and he’s just as fascinated by the amazing animals that share our planet. His curiosity doesn’t stop there: he enjoys exploring body parts and how they function, studying countries and maps, and diving into the mysteries of rocks, volcanoes, and geology.\n\nWith a sketchbook always nearby, Faris brings his discoveries to life through drawing and art. This website is his creative playground — a place where science, geography, nature, and imagination come together in colorful harmony.',
 };
