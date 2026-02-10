@@ -33,7 +33,7 @@ class DashboardScreen extends StatelessWidget {
                   'Bahu & Faris',
                   style: TextStyle(
                     fontFamily: 'Serif',
-                    color: Color(0xFF422B22), // Dark, warm brown
+                    color: Color(0xFF422B22),
                     fontSize: 40,
                     fontWeight: FontWeight.bold,
                   ),
@@ -41,7 +41,7 @@ class DashboardScreen extends StatelessWidget {
                 const Text(
                   'An Artistic Journey',
                   style: TextStyle(
-                    color: Color(0xFF6E5B52), // Muted brown
+                    color: Color(0xFF6E5B52),
                     fontSize: 16,
                     letterSpacing: 2.0,
                   ),
@@ -49,34 +49,37 @@ class DashboardScreen extends StatelessWidget {
                 const Spacer(flex: 2),
 
                 // --- ARTIST AVATARS ---
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                Column(
                   children: [
+                    // Grandfather's Portrait
                     _ArtistAvatar(
-                      name: 'Muhammad Hassnat Bahu',
-                      avatarAsset: 'assets/artist/bahu-2.jpg',
-                      onTap: () => _navigateToArtistDetail(context, bahuData),
+                      name: 'Guided by His Wisdom',
+                      avatarAsset: 'assets/artist/SaeenG.jpeg',
+                      isProminent: true,
+                      onTap: () {}, // No action on tap
                     ),
-                    _ArtistAvatar(
-                      name: 'Muhammad Faris',
-                      avatarAsset: 'assets/artist/faris-2.jpg',
-                      onTap: () => _navigateToArtistDetail(context, farisData),
+                    const SizedBox(height: 20),
+                    // Artists' Portraits
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _ArtistAvatar(
+                          name: 'Muhammad Hassnat Bahu',
+                          avatarAsset: 'assets/artist/bahu.jpg',
+                          onTap: () =>
+                              _navigateToArtistDetail(context, bahuData),
+                        ),
+                        _ArtistAvatar(
+                          name: 'Muhammad Faris',
+                          avatarAsset: 'assets/artist/faris.jpg',
+                          onTap: () =>
+                              _navigateToArtistDetail(context, farisData),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                const Spacer(flex: 2),
-
-                // --- ARTISTIC SLOGAN ---
-                const Text(
-                  '"Creativity in Every Stroke"',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontStyle: FontStyle.italic,
-                    color: Color(0xFF6E5B52),
-                    fontSize: 16,
-                  ),
-                ),
-                const Spacer(flex: 1),
+                const Spacer(flex: 3),
 
                 // --- NAVIGATION BUTTONS ---
                 _NavigationButton(
@@ -102,14 +105,9 @@ class DashboardScreen extends StatelessWidget {
                   label: 'View Snaps',
                 ),
                 const Spacer(),
-
-                // --- CREATOR CREDIT ---
                 const Text(
                   'Made by Saeed Murrad',
-                  style: TextStyle(
-                    color: Color(0xFFB0A49D), // Subtle, light brown
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: Color(0xFFB0A49D), fontSize: 12),
                 ),
               ],
             ),
@@ -141,33 +139,66 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
-// --- WIDGETS ---
+// --- ARTIST DATA MAPS ---
+const bahuData = {
+  'name': 'Muhammad Hassnat Bahu',
+  'skills': 'Drawing • Painting • Animal & Nature Art',
+  'avatarAsset': 'assets/artist/bahu-2.jpg',
+  'intro':
+      'Welcome to the Creative World of Muhammad Hassnat Bahoo...\n\nMeet Muhammad Hassnat Bahoo — a young artist with an extraordinary eye for detail and a heart full of imagination. Hassnat loves drawing, painting, and bringing the beauty of animals and the rainforest to life through his artwork. His passion for creativity shines in every piece he creates, and he takes great pride in his growing portfolio.\n\nThis website is a window into his artistic world — a place where colors, creatures, and creativity come together to celebrate his talent and ever‑expanding artistic journey.',
+};
 
+const farisData = {
+  'name': 'Muhammad Faris',
+  'skills': 'Astronomy & Space • Geography & Maps • Drawing & Art',
+  'avatarAsset': 'assets/artist/faris-2.jpg',
+  'intro':
+      'Welcome to Muhammad Faris’s World of Wonder...\n\nStep into the vibrant universe of Muhammad Faris — a curious young explorer with a passion for discovering how our world and the cosmos work. Faris loves learning about astronomy, planets, and the solar system, and he’s just as fascinated by the amazing animals that share our planet. His curiosity doesn’t stop there: he enjoys exploring body parts and how they function, studying countries and maps, and diving into the mysteries of rocks, volcanoes, and geology.\n\nWith a sketchbook always nearby, Faris brings his discoveries to life through drawing and art. This website is his creative playground — a place where science, geography, nature, and imagination come together in colorful harmony.',
+};
+
+// --- WIDGETS ---
 class _ArtistAvatar extends StatelessWidget {
   final String name;
   final String avatarAsset;
   final VoidCallback onTap;
+  final bool isProminent;
 
   const _ArtistAvatar({
     required this.name,
     required this.avatarAsset,
     required this.onTap,
+    this.isProminent = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final double size = isProminent ? 140 : 110;
+    final nameStyle = isProminent
+        ? const TextStyle(
+            color: Color(0xFF6E5B52),
+            fontSize: 14,
+            fontStyle: FontStyle.italic,
+          )
+        : const TextStyle(
+            color: Color(0xFF422B22),
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          );
+
     return GestureDetector(
-      onTap: onTap,
+      onTap: isProminent
+          ? null
+          : onTap, // Disable tap for grandfather's picture
       child: Column(
         children: [
           Container(
-            width: 130,
-            height: 130,
+            width: size,
+            height: size,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(isProminent ? 28 : 22),
               boxShadow: [
                 BoxShadow(
-                  color: const Color.fromRGBO(0, 0, 0, 0.1),
+                  color: Colors.black.withOpacity(0.12),
                   blurRadius: 20,
                   spreadRadius: 5,
                   offset: const Offset(0, 10),
@@ -175,7 +206,7 @@ class _ArtistAvatar extends StatelessWidget {
               ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(isProminent ? 28 : 22),
               child: Image.asset(
                 avatarAsset,
                 fit: BoxFit.cover,
@@ -183,16 +214,8 @@ class _ArtistAvatar extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 20),
-          Text(
-            name,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Color(0xFF422B22),
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          const SizedBox(height: 16),
+          Text(name, textAlign: TextAlign.center, style: nameStyle),
         ],
       ),
     );
@@ -232,7 +255,7 @@ class _NavigationButton extends StatelessWidget {
           boxShadow: isPrimary
               ? [
                   BoxShadow(
-                    color: const Color(0xFFC89B79).withAlpha(77), // 0.3 opacity
+                    color: const Color(0xFFC89B79).withOpacity(0.3),
                     blurRadius: 15,
                     spreadRadius: 2,
                     offset: const Offset(0, 8),
@@ -259,20 +282,3 @@ class _NavigationButton extends StatelessWidget {
     );
   }
 }
-
-// --- Full data maps needed for navigation ---
-const bahuData = {
-  'name': 'Muhammad Hassnat Bahu',
-  'skills': 'Drawing • Painting • Animal & Nature Art',
-  'avatarAsset': 'assets/artist/bahu.jpg',
-  'intro':
-      'Welcome to the Creative World of Muhammad Hassnat Bahoo...\n\nMeet Muhammad Hassnat Bahoo — a young artist with an extraordinary eye for detail and a heart full of imagination. Hassnat loves drawing, painting, and bringing the beauty of animals and the rainforest to life through his artwork. His passion for creativity shines in every piece he creates, and he takes great pride in his growing portfolio.\n\nThis website is a window into his artistic world — a place where colors, creatures, and creativity come together to celebrate his talent and ever‑expanding artistic journey.',
-};
-
-const farisData = {
-  'name': 'Muhammad Faris',
-  'skills': 'Astronomy & Space • Geography & Maps • Drawing & Art',
-  'avatarAsset': 'assets/artist/faris.jpg',
-  'intro':
-      'Welcome to Muhammad Faris’s World of Wonder...\n\nStep into the vibrant universe of Muhammad Faris — a curious young explorer with a passion for discovering how our world and the cosmos work. Faris loves learning about astronomy, planets, and the solar system, and he’s just as fascinated by the amazing animals that share our planet. His curiosity doesn’t stop there: he enjoys exploring body parts and how they function, studying countries and maps, and diving into the mysteries of rocks, volcanoes, and geology.\n\nWith a sketchbook always nearby, Faris brings his discoveries to life through drawing and art. This website is his creative playground — a place where science, geography, nature, and imagination come together in colorful harmony.',
-};
